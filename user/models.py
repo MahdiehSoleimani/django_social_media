@@ -9,29 +9,39 @@ from django.conf import settings
 
 
 class Profile(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	image = models.ImageField(_('Image'),
+	user = models.ForeignKey(User,
+								on_delete=models.CASCADE,)
+	image = models.ImageField('Image',
                               default='default.png',
-                              upload_to='profile_pics')
+                              upload_to='profile_pics',
+							  )
+	password = models.CharField(
+		max_length=12,
+		verbose_name= _("password"),
+		help_text=_('password to login'),
+		null=False,
+		blank=False,
+	)
 	bio = models.CharField(_('Bio'),
                            max_length=255,
-                           blank=True)
-	friends = models.ManyToManyField("Profile", blank=True)
-    Datetime = models.DateTimeField(auto_now_add=True)
+                           blank=True,
+						   null=True,)
+    Datetime = models.DateTimeField(auto_now_add=True,)
 
 
-def __str__(self):
-		return str(self.user.username)
+	def __str__(self):
+		return self.user.username
 
 
 class FriendRequest(models.Model):
-	to_user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                related_name='to_user',
+	to_user = models.ForeignKey(User,
+                                related_name='follower',
                                 on_delete=models.CASCADE)
 
-	from_user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                  related_name='from_user',
+	from_user = models.ForeignKey(User,
+                                  related_name='following',
                                   on_delete=models.CASCADE)
+
 	timestamp = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
