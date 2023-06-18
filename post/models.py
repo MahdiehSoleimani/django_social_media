@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.urls import reverse
+#from django.urls import reverse
 from core.models import BaseModel, TimeStampMixin
 
 
@@ -14,8 +14,8 @@ class Post(models.Model, BaseModel, TimeStampMixin):
     def __str__(self):
         return self.description
 
-    def get_absolute_url(self):
-        return reverse('post-detail', kwargs={'pk': self.pk})
+    #def get_absolute_url(self):
+        #return reverse('post-detail', kwargs={'pk': self.pk})
 
     def is_liked_by_user(self, user) -> bool:
         return self.like_set.filter(user=user).excist()
@@ -61,8 +61,12 @@ class Like(models.Model, BaseModel, TimeStampMixin):
 
 class Room(models.Model, BaseModel):
     # room_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    author = models.ForeignKey(User, related_name='author_room', on_delete=models.CASCADE)
-    friend = models.ForeignKey(User, related_name='friend_room', on_delete=models.CASCADE)
+    author = models.ForeignKey(User,
+                               related_name='author_room',
+                               on_delete=models.CASCADE)
+    friend = models.ForeignKey(User,
+                               related_name='friend_room',
+                               on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
