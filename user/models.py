@@ -38,7 +38,7 @@ def post_save_user_model_receiver(sender, instance, created):
             Profile.objects.create(user=instance)
         except:
             pass
-            
+
 
     def profile_posts(self):
         return self.username.post_set.all()
@@ -80,7 +80,6 @@ class FriendList(models.Model):
     def unfriend(self, remove):
         remover_friends_list = self
         remover_friends_list.remove_friend(remove)
-
         friends_list = FriendList.objects.get(user=remove)
         friends_list.remove_friend(self.user)
 
