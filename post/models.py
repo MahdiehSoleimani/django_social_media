@@ -20,6 +20,12 @@ class Post(models.Model, BaseModel, TimeStampMixin):
     def is_liked_by_user(self, user) -> bool:
         return self.like_set.filter(user=user).excist()
 
+    def total_likes(self):
+        return self.likes.count()
+
+    def total_saves(self):
+        return self.saves.count()
+
 
 # Comment model links a comment with the post and the user.
 class Comments(models.Model, BaseModel, TimeStampMixin):
@@ -32,6 +38,9 @@ class Comments(models.Model, BaseModel, TimeStampMixin):
     reply = models.ForeignKey('self',
                               null=True,
                               blank=True)
+
+    def total_click(self):
+        return self.likes.count()
 
 
 class Tag(models.Model, BaseModel, TimeStampMixin):
@@ -49,3 +58,30 @@ class Like(models.Model, BaseModel, TimeStampMixin):
     post = models.ForeignKey(Post,
                              on_delete=models.CASCADE)
 
+
+class Room(models.Model, BaseModel):
+    # room_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    author = models.ForeignKey(User, related_name='author_room', on_delete=models.CASCADE)
+    friend = models.ForeignKey(User, related_name='friend_room', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.room_id}-{self.author}-{self.friend}"
+
+
+class Chat(models.Model):
+    room_id = models.ForeignKey(Room,
+                                on_delete=models.CASCADE,
+                                related_name='chats')
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               related_name='author_msg')
+    friend = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               related_name='friend_msg')
+    text = models.CharField(max_length=300)
+    date = models.DateTimeField(auto_now_add=True)
+    has_seen = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '%s - %s' %(self.id, self.date)
