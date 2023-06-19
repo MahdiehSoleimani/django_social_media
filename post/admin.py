@@ -1,19 +1,14 @@
 from django.contrib import admin
-from .models import Post, Comment, Like, Tag, Room, Chat, Notification, Image
+from .models import Post, Comment, Reaction, Tag, Room, Chat, Notification, Image
 
 # admin.site.register(Post)
 # admin.site.register(Comments)
 # admin.site.register(Like)
 
 
-class PostTagInline(admin.TabularInline):
-    model = Tag
-    extra = 1
-
-
-class PostCommentInline(admin.TabularInline):
-    model = Comment
-    extra = 1
+# class PostTagInline(admin.TabularInline):
+#    model = Tag
+#    extra = 1
 
 
 class PostImageInline(admin.TabularInline):
@@ -25,7 +20,7 @@ class PostImageInline(admin.TabularInline):
 class PostAdmin(admin.ModelAdmin):
     list_display = ['pic', 'user', 'description']
     search_fields = ['user']
-    inlines = ['PostImageInline', 'PostCommentInline', 'PostTagInline']
+    inlines = ['PostImageInline']
 
 
 @admin.register(Comment)
@@ -42,8 +37,8 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ['text']
 
 
-@admin.register(Like)
-class LikeAdmin(admin.ModelAdmin):
+@admin.register(Reaction)
+class ReactionAdmin(admin.ModelAdmin):
     list_display = ['user', 'post']
     list_filter = ['post']
     search_fields = ['post']
