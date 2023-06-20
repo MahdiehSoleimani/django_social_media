@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from core.models import BaseModel, TimeStampMixin
 from django.utils.translation import gettext as _
 from django.db.models import Q
-# This model is for any post that a user posts on the website.
 
 
 class Post(TimeStampMixin, BaseModel):
