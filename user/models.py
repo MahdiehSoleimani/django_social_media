@@ -27,15 +27,10 @@ class Profile(TimeStampMixin, BaseModel):
                            max_length=255,
                            blank=True,
                            null=True)
+    email = models.EmailField()
 
     def profile_posts(self):
         return self.objects.post.all()
-
-    def get_friends(self):
-        return self.friends.all()
-
-    def get_friends_no(self):
-        return self.friends.count()
 
     def __str__(self):
         return f'{self.username} Profile'
