@@ -3,11 +3,10 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from pyexpat.errors import messages
 from .forms import NewPostForm
-from .models import Post, Reaction
+from .models import Post, Reaction, Notification
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -95,3 +94,13 @@ def search_post(request):
     context = {'posts': object_list}
     return render(request, 'search_post', context)
 
+
+@login_required
+def show_notifications(request):
+    user = request.user
+    notifications = Notification.objects.filter(user=user)
+    context = {
+        'user': user,
+        'notification': notifications
+    }
+    return render(request, 'show_notifications', context)
