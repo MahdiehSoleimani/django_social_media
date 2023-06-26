@@ -1,17 +1,37 @@
 from abc import ABC
-
-from django.shortcuts import redirect
-from django.views.generic import UpdateView
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from pyexpat.errors import messages
+from .forms import NewPostForm
 from .models import Post, Reaction
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.paginator import Paginator
 
 
 # Create your views here.
+class UserPostListView(LoginRequiredMixin):
+    model = Post
+    template_name = 'user_posts.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super(UserPostListView, self).get_context_data(**kwargs)
+        user = get_object_or_404('User', username=self.get('username'))
+        for reaction in Post.objects.filter(user_name=user):
+            if Reaction.objects.filter(user=self.request.user, post=reaction):
+                liked = [reaction]
+        context['liked_post'] = liked
+        return context
+
+    def get_queryset(self):
+        user = get_object_or_404('User', username=self.get('username'))
+        return Post.objects.filter(user_name=user).order_by('-date_posted')
 
 
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView, ABC):
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, ABC):
     model = Post
     Fields = ['description', 'image', 'tag']
 
@@ -41,5 +61,37 @@ def like(request):
         liked = True
         Reaction.objects.create(user=user, post=post)
     resp = {'liked': liked}
-    response = request.save(resp)
-    return HttpResponse(response)
+    return HttpResponse(request.save(resp))
+
+
+@login_required
+def create_post(request):
+    user = request.user
+    if request.method == 'POST':
+        form = NewPostForm(request.POST, )
+        if form.is_valid():
+            new_form = form.save()
+            new_form.user_name = user
+            new_form.save()
+            messages.success(request, 'Created post successfully!')
+            return redirect('home')
+    else:
+        new_form = NewPostForm()
+    return render(request, create_post, {'form': form})
+
+
+@login_required
+def delete_post(request):
+    post = Post.objects.get()
+    if request.user == post.user:
+        Post.objects.get().delete()
+    return redirect('home')
+
+
+@login_required
+def search_post(request):
+    query = request.GET.get('post')
+    object_list = Post.objects.filter(tags_incontains=query)
+    context = {'posts': object_list}
+    return render(request, 'search_post', context)
+
