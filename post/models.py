@@ -9,17 +9,18 @@ class Post(TimeStampMixin, BaseModel):
     description = models.CharField(max_length=255,
                                    blank=True,
                                    null=True)
-    pic = models.ImageField('Image', upload_to='path/to/img')
+    pic = models.ImageField('Image', upload_to='Post_image')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    slug = models.SlugField()
 
     def __str__(self):
         return self.description
 
-# def get_absolute_url(self):
-# return reverse('post-detail', kwargs={'pk': self.pk})
+    def get_absolute_url(self):
+        return "/users/{}".format(self.slug)
 
-    def is_liked_by_user(self, user) -> bool:
-        return self.Raction_set.filter(user=user).excist()
+    def liked(self, user) -> bool:
+        return self.Reaction_set.filter(user=user).excist()
 
     def total_likes(self):
         return self.Reaction.count()
@@ -28,7 +29,6 @@ class Post(TimeStampMixin, BaseModel):
 # return self.saves.count()
 
 
-# Comment model links a comment with the post and the user.
 class Comment(TimeStampMixin, BaseModel):
     post = models.ForeignKey(Post,
                              on_delete=models.CASCADE)
@@ -188,7 +188,8 @@ class Reaction(models.Model):
 
     def is_liked(self):
         """Check if the reaction is liked (status is True)"""
-        return self.status == True
+        self.status = True
+        self.save()
 
     def remove_reaction(self):
         """Remove the reaction by setting the status to None"""

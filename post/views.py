@@ -1,6 +1,5 @@
 from abc import ABC
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from pyexpat.errors import messages
 from .forms import NewPostForm
 from .models import Post, Reaction, Notification
@@ -16,13 +15,13 @@ class UserPostListView(LoginRequiredMixin):
     context_object_name = 'posts'
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super(UserPostListView, self).get_context_data(**kwargs)
+    def get_context_data(self):
+        context = super(UserPostListView, self).get_context_data()
         user = get_object_or_404('User', username=self.get('username'))
         for reaction in Post.objects.filter(user_name=user):
             if Reaction.objects.filter(user=self.request.user, post=reaction):
                 liked = [reaction]
-        context['liked_post'] = liked
+                context = {'liked_post': liked}
         return context
 
     def get_queryset(self):
@@ -72,10 +71,10 @@ def create_post(request):
             new_form = form.save()
             new_form.user_name = user
             new_form.save()
-            messages.success(request, 'Created post successfully!')
+            messages.success(request, 'Post created  successfully!')
             return redirect('home')
     else:
-        new_form = NewPostForm()
+        form = NewPostForm()
     return render(request, create_post, {'form': form})
 
 

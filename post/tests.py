@@ -10,6 +10,14 @@ class PostTestCase(TestCase):
         """
         self.user = User.objects.create_user(username='testuser', password='testpassword')
 
+    fieldsets = (
+        (
+            None, {
+                'fields': ('text', ('user', 'status', 'is_deleted'), 'tags'),
+            },
+        ),
+    )
+    
     def test_post_creation(self):
         """
         Create a post

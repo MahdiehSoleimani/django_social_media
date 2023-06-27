@@ -7,5 +7,6 @@ urlpatterns = [
     path('post/<int:pk>/update/', views.PostUpdateView, name='post-update'),
     path('post/<int:pk>/delete/', views.post_delete, name='post-delete'),
     path('search_posts/', views.search_posts, name='search_posts'),
-    path('notifications/',views.show_notifications, name='notification')
+    path('notifications/', views.show_notifications, name='notification'),
+	path('user_posts/<str:username>', UserPostListView.as_view(), name='user-posts'),
 ]
