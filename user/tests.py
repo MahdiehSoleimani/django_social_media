@@ -57,9 +57,5 @@ class FriendRequestTestCase(TestCase):
         self.assertNotIn(self.sender, self.receiver.profile.friends.all())
 
 
-# Run the tests
-if __name__ == '__main__':
-    import django
-    django.setup()
-    test.main()
+
 

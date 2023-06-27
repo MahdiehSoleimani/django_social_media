@@ -1,22 +1,22 @@
-from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, PermissionsMixin
 from django.utils.translation import gettext as _
 from post import models
 from core.models import BaseModel, TimeStampMixin
+from django.contrib.auth.models import AbstractUser
+
 # Register your models here.
 
 
-class Profile(TimeStampMixin, BaseModel):
+class Profile(TimeStampMixin, BaseModel, AbstractUser, PermissionsMixin):
     username = models.OnetoOnefield(
         User,
         on_delete=models.CASCADE,
         unique=True,)
 
     image = models.ImageField(
-        default='default.png',
         upload_to='profile_pics',
         null=True,
-        blank=True)
+        blank=True,)
     is_online = models.BooleanField(default=False)
     password = models.CharField(
         _("Password"),
@@ -28,6 +28,7 @@ class Profile(TimeStampMixin, BaseModel):
                            blank=True,
                            null=True)
     email = models.EmailField()
+    slug = models.SlugField()
 
     def profile_posts(self):
         return self.objects.post.all()
@@ -76,7 +77,7 @@ class FriendRequest(BaseModel):
         self.save()
 
     def add_friend(self, account):
-        if not account in self.sender.all():
+        if account in self.sender.all():
             self.sender.add(account)
             self.save()
 
@@ -92,5 +93,5 @@ class FriendRequest(BaseModel):
         friends_list.remove_friend(self.sender)
 
     def is_mutual_friend(self, friend):
-        if not friend in self.sender.all():
+        if friend not in self.sender.all():
             return False

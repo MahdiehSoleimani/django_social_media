@@ -3,9 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from post.models import Post
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from .models import Profile, FriendRequest
-from .forms import UserRegisterForm
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
@@ -22,14 +21,6 @@ def got_online(user):
 def got_offline(user):
     user.profile.is_online = False
     user.profile.save()
-
-
-@login_required
-def delete_friend_request(request, id):
-    from_user = get_object_or_404('User', id=id)
-    quest = FriendRequest.objects.filter(from_user=from_user, to_user=request.user).first()
-    quest.delete()
-    return HttpResponseRedirect('/user/{}'.format(request.user.profile.slug))
 
 
 def unfollow(request, id):
@@ -74,7 +65,7 @@ def profile_view(request, slug):
         'post_count': user_posts.count
     }
 
-    return render(request, "users/profile.html", context)
+    return render(request, "user/profile.html", context)
 
 
 class UserUnfollowView(LoginRequiredMixin, View):
@@ -115,4 +106,63 @@ class UserFollowView(LoginRequiredMixin, View):
             FriendRequest(sender=request.user, receiver=user).save()
             messages.success(request, 'you followed this user')
 
+
+@login_required
+def send_friend_request(request, id):
+    user = get_object_or_404(User, id=id)
+    frequest, created = FriendRequest.objects.get_or_create(
+        sender=request.user,
+        receiver=user)
+    return HttpResponseRedirect('/users/{}'.format(user.profile.slug))
+
+
+@login_required
+def cancel_friend_request(request, id):
+    user = get_object_or_404(User, id=id)
+    frequest = FriendRequest.objects.filter(
+        sender=request.user,
+        receiver=user).first()
+    frequest.delete()
+    return HttpResponseRedirect('/user/{}'.format(user.profile.slug))
+
+
+@login_required
+def accept_friend_request(request, id):
+    from_user = get_object_or_404(User, id=id)
+    frequest = FriendRequest.objects.filter(from_user=from_user, to_user=request.user).first()
+    user1 = frequest.to_user
+    user2 = from_user
+    user1.profile.friends.add(user2.profile)
+    user2.profile.friends.add(user1.profile)
+    if FriendRequest.objects.filter(from_user=request.user,
+                                    to_user=from_user).first():
+        request_rev = FriendRequest.objects.filter(from_user=request.user,
+                                                   to_user=from_user).first()
+        request_rev.delete()
+    frequest.delete()
+    return HttpResponseRedirect('/user/{}'.format(request.user.profile.slug))
+
+
+@login_required
+def search_users(request):
+    query = request.GET.get('q')
+    object_list = User.objects.filter(username__icontains=query)
+    context = {'users': object_list}
+    return render(request, "users/search_users.html", context)
+
+
+def public_profile(request, username):
+    """ Creating a public profile view """
+    user = User.objects.get(username=username)
+    return render(request, 'user/public_profile.html', {"public_user": user})
+
+
+class ProfileListView(LoginRequiredMixin):
+    """ All user profiles """
+    model = Profile
+    template_name = "user/profile.html"
+    context_object_name = "profiles"
+
+    def get_queryset(self, request):
+        return Profile.objects.all().exclude(user=self.request.user)
 
