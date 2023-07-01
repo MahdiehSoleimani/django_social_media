@@ -1,4 +1,7 @@
+from django.conf import settings
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User, PermissionsMixin
+from django.shortcuts import redirect
 from django.utils.itercompat import is_iterable
 from django.utils.translation import gettext as _
 from post import models
@@ -32,7 +35,7 @@ class Profile(AbstractUser, PermissionsMixin):
                            blank=True,
                            null=True)
     email = models.EmailField(_("email address"), blank=True)
-    slug = models.SlugField()
+    slug = AutoSlugField(populate_from='user')
     is_staff = models.BooleanField(
         _("staff status"),
         default=False,
@@ -72,10 +75,10 @@ def has_perms(self, perm_list, obj=None):
 
 
 class FriendRequest(BaseModel):
-    sender = models.ForeignKey(User,
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE,
                                related_name='sender')
-    receiver = models.ForeignKey(User,
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL,
                                  on_delete=models.CASCADE,
                                  related_name='receiver')
     is_active = models.BooleanField(blank=True,
