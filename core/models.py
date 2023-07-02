@@ -1,4 +1,4 @@
-from django.db.models import Manager
+from django.db.models import Manager, Q
 from django.utils import timezone
 
 from django.db import models
@@ -22,8 +22,9 @@ class MyManage(models.Manager):
 
 
 class SoftManager(Manager):
+
     def get_queryset(self):
-        return SoftQuerySet(self.model, self._db).filter(is_deleted=False)
+        return SoftQuerySet(self.model, self._db).filter(Q(is_deleted=False)| Q(is_deleted__isnull=True))
 
 
 class SoftQuerySet(QuerySet):
@@ -38,7 +39,7 @@ class SoftDelete(models.Model):
     deleted_at = models.BooleanField(null=True,
                                      blank=True,
                                      editable=False,)
-    objects = SoftQuerySet()
+    objects = SoftManager()
 
     class Meta:
         abstract = True
