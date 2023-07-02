@@ -1,17 +1,17 @@
 from django.conf import settings
-from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User, PermissionsMixin
-from django.shortcuts import redirect
+from autoslug import AutoSlugField
+from django.db.models import Manager
 from django.utils.itercompat import is_iterable
 from django.utils.translation import gettext as _
 from post import models
-from core.models import BaseModel, TimeStampMixin
+from core.models import BaseModel, SoftDelete
 from django.contrib.auth.models import AbstractUser
 
 # Register your models here.
 
 
-class Profile(AbstractUser, PermissionsMixin):
+class Profile(AbstractUser, PermissionsMixin, SoftDelete):
     username = models.OnetoOnefield(
         User,
         on_delete=models.CASCADE,
@@ -33,8 +33,9 @@ class Profile(AbstractUser, PermissionsMixin):
     bio = models.CharField(_('Bio'),
                            max_length=255,
                            blank=True,
-                           null=True)
-    email = models.EmailField(_("email address"), blank=True)
+                           null=True,
+                           help_text='Write 255 char about yourself here.')
+    email = models.EmailField(_("email address"), blank=False, null=False)
     slug = AutoSlugField(populate_from='user')
     is_staff = models.BooleanField(
         _("staff status"),
@@ -50,11 +51,24 @@ class Profile(AbstractUser, PermissionsMixin):
         ),
     )
 
+    class Meta:
+        default_manager_name = 'objects'
+
     def profile_posts(self):
         return self.objects.post.all()
 
     def __str__(self):
         return f'{self.username} Profile'
+
+    def get_absolute_url(self):
+        return "/users/{}".format(self.slug)
+
+
+class RecycleProfile(Profile):
+    objects = Manager()
+
+    class Meta:
+        proxy = True
 
 
 @property
