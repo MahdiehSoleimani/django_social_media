@@ -9,12 +9,13 @@ class Post(TimeStampMixin, BaseModel, SoftDelete):
     description = models.CharField(max_length=255,
                                    blank=True,
                                    null=True,
-                                   help_text='Required 255 characters or fewer words about post.',)
+                                   help_text='Required 255 characters or fewer words about post ',)
     pic = models.ImageField('Image',
                             upload_to='Post_image',
                             help_text='picture for post',)
     user = models.ForeignKey(User,
-                             on_delete=models.CASCADE,)
+                             on_delete=models.CASCADE,
+                             help_text="Select the user who authored the post.")
     slug = models.SlugField()
 
     class Meta:
@@ -49,8 +50,9 @@ class Comment(TimeStampMixin, BaseModel):
                              on_delete=models.CASCADE,)
     user = models.ForeignKey(User,
                              related_name='Comments',
-                             on_delete=models.CASCADE)
-    comment = models.CharField(max_length=255)
+                             on_delete=models.CASCADE,
+                             help_text="Select the user who posted the comment.",)
+    comment = models.CharField(max_length=255,)
     reply = models.ForeignKey('self',
                               on_delete=models.CASCADE,
                               null=True,
@@ -85,7 +87,7 @@ class Comment(TimeStampMixin, BaseModel):
 
 class Tag(TimeStampMixin, BaseModel):
     text = models.CharField(max_length=20,
-                            help_text='')
+                            help_text="Enter the name of the tag.")
     post = models.ManyToManyField('Post',
                                   related_name='Tag')
 
