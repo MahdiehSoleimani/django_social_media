@@ -1,9 +1,7 @@
 from django.db.models import Manager, Q
 from django.utils import timezone
-
 from django.db import models
 from uuid import uuid4
-
 from django.db.models.query import QuerySet
 
 
@@ -24,7 +22,7 @@ class MyManage(models.Manager):
 class SoftManager(Manager):
 
     def get_queryset(self):
-        return SoftQuerySet(self.model, self._db).filter(Q(is_deleted=False)| Q(is_deleted__isnull=True))
+        return SoftQuerySet(self.model, self._db).filter(Q(is_deleted=False) | Q(is_deleted__isnull=True))
 
 
 class SoftQuerySet(QuerySet):
