@@ -1,4 +1,13 @@
+
 This is a social media platform built using Django, where users can create profiles, share posts, follow other users, like/dislike posts, and comment on them.
+In fact this is my first django project.
+
+## Database Structure
+This Django application utilizes a database to store and manage various entities and their relationships. The following ERD provides a visual representation of the database structure:
+
+![1.png](..%2F1.png)
+
+The ERD illustrates the entities, relationships, and attributes within the database. It serves as a reference for understanding how the data is organized and connected in the application.
 
 ## Features
 
