@@ -1,9 +1,11 @@
 
 This is a social media platform built using Django, where users can create profiles, share posts, follow other users, like/dislike posts, and comment on them.
-In fact this is my first django project.
+In fact this is my first django project. 
 
 ## Database Structure
-This Django application utilizes a database to store and manage various entities and their relationships. The following ERD provides a visual representation of the database structure:
+This utility takes a plain text description of entities, their attributes and the relationships between entities and produces a visual diagram modeling the description. The visualization is produced by using Dot with GraphViz. There are limited options for specifying color and font information. Also, erd can output graphs in a variety of formats, including but not limited to: pdf, svg, eps, png, jpg, plain text and dot.
+
+Here's an example of the output produced by erd (click on it for a larger PNG version):
 
 ![1.png](..%2F1.png)
 
