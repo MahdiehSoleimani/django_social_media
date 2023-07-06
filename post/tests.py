@@ -59,9 +59,17 @@ class CommentTestCase(TestCase):
         Create a comment and its replies
         Get the replies for the comment
         """
-        comment = Comment.objects.create(post=self.post, user=self.user, comment='Test comment')
-        reply1 = Comment.objects.create(post=self.post, user=self.user, comment='Reply 1', reply=comment)
-        reply2 = Comment.objects.create(post=self.post, user=self.user, comment='Reply 2', reply=comment)
+        comment = Comment.objects.create(post=self.post,
+                                         user=self.user,
+                                         comment='Test comment')
+        reply1 = Comment.objects.create(post=self.post,
+                                        user=self.user,
+                                        comment='Reply 1',
+                                        reply=comment)
+        reply2 = Comment.objects.create(post=self.post,
+                                        user=self.user,
+                                        comment='Reply 2',
+                                        reply=comment)
 
         replies = comment.get_replies()
         self.assertEqual(len(replies), 2)
@@ -70,10 +78,13 @@ class CommentTestCase(TestCase):
 
     def test_add_reply(self):
         """Create a comment"""
-        comment = Comment.objects.create(post=self.post, user=self.user, comment='Test comment')
+        comment = Comment.objects.create(post=self.post,
+                                         user=self.user,
+                                         comment='Test comment')
 
         """Add a reply"""
-        reply_user = User.objects.create_user(username='replyuser', password='replypassword')
+        reply_user = User.objects.create_user(username='replyuser',
+                                              password='replypassword')
         reply_content = 'Reply to comment'
         reply = comment.add_reply(reply_user, reply_content)
 
@@ -85,9 +96,17 @@ class CommentTestCase(TestCase):
 
     def test_delete_comment(self):
         """ Create a comment and its replies"""
-        comment = Comment.objects.create(post=self.post, user=self.user, comment='Test comment')
-        reply1 = Comment.objects.create(post=self.post, user=self.user, comment='Reply 1', reply=comment)
-        reply2 = Comment.objects.create(post=self.post, user=self.user, comment='Reply 2', reply=comment)
+        comment = Comment.objects.create(post=self.post,
+                                         user=self.user,
+                                         comment='Test comment')
+        reply1 = Comment.objects.create(post=self.post,
+                                        user=self.user,
+                                        comment='Reply 1',
+                                        reply=comment)
+        reply2 = Comment.objects.create(post=self.post,
+                                        user=self.user,
+                                        comment='Reply 2',
+                                        reply=comment)
 
         """Delete the comment and its replies"""
         comment.delete_comment()
@@ -169,11 +188,15 @@ class ReactionTestCase(TestCase):
         Create a test post
         Create a test reaction
         """
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(username='testuser',
+                                             password='testpassword')
 
-        self.post = Post.objects.create(title='Test Post', content='Lorem ipsum dolor sit amet')
+        self.post = Post.objects.create(title='Test Post',
+                                        content='Lorem ipsum dolor sit amet')
 
-        self.reaction = Reaction.objects.create(user=self.user, post=self.post, status=None)
+        self.reaction = Reaction.objects.create(user=self.user,
+                                                post=self.post,
+                                                status=None)
 
     def test_like_reaction(self):
         """

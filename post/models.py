@@ -115,9 +115,6 @@ class Tag(TimeStampMixin, BaseModel):
 class Image(models.Model):
     name = models.CharField(_("Name"), max_length=50)
     alt = models.CharField(_("Alternative Text"), max_length=100)
-    product = models.ForeignKey("Product",
-                                verbose_name=_("Product"),
-                                on_delete=models.CASCADE)
     image = models.ImageField(_("Image"), upload_to='products',)
     is_default = models.BooleanField(_("Is default image?"), default=False,)
 

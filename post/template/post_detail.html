@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Post List</h1>
+  {% for post in posts %}
+    <div class="post">
+      <h2>{{ post.description }}</h2>
+      <img src="{{ .Post_image/download.png }}" alt="Twitter">
+      <p>Created by: {{ post.user.username }}</p>
+      <p>Slug: {{ post.slug }}</p>
+      <p>Total Likes: {{ post.total_likes }}</p>
+      <a href="{% url 'post_detail' post.pk %}">View Details</a>
+    </div>
+  {% empty %}
+    <p>No posts available.</p>
+  {% endfor %}
+
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      <span class="current-page">{{ page_obj.number }}</span>
+    </div>
+  {% endif %}
+{% endblock %}
