@@ -7,7 +7,7 @@ This utility takes a plain text description of entities, their attributes and th
 
 Here's an example of the output produced by erd (click on it for a larger PNG version):
 
-![1.png](..%2F1.png)
+![ERD.png](ERD.png)
 
 The ERD illustrates the entities, relationships, and attributes within the database. It serves as a reference for understanding how the data is organized and connected in the application.
 
