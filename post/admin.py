@@ -22,10 +22,11 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['pic', 'user', 'description']
     search_fields = ['user']
     inlines = ['PostImageInline']
+    list_filter = ('updated_at',)
 
-    @admin.action
-    def published_post(self, post, Query):
-        Query.Post.
+    # @admin.action
+    # def published_post(self, post, Query):
+    #     pass
 
 
 @admin.register(Comment)
@@ -33,7 +34,12 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ['post', 'user', 'comment', 'reply']
     list_filter = ['user']
     search_fields = ['post']
+    ordering = ['created_at']
 
+    def save_model(self, request, obj, form, change):
+        if not obj.user:
+            obj.user = request.user
+        super().save_model(self, request, obj, form, change)
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):

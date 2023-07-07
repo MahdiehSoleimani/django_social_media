@@ -1,11 +1,19 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-  <h1>Create Post</h1>
-  <form method="post" enctype="multipart/form-data">
+  <div class="post-create">
+  <form class="post-form" method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create</button>
+    <div class="form-group">
+      <label for="caption">Caption:</label>
+      <textarea id="caption" class="caption-input" name="caption" placeholder="Write a caption..."></textarea>
+    </div>
+    <div class="form-group">
+      <label for="image">Image:</label>
+      <input type="file" id="image" name="image" accept="image/*">
+    </div>
+    <button type="submit" class="post-btn">Post</button>
   </form>
-  <a href="{% home %}">Back to List</a>
+</div>
+
 {% endblock %}

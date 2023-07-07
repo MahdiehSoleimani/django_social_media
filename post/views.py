@@ -50,6 +50,17 @@ class PostListView(ListView, View):
             },
         )
 
+    def get_context_data(self, **kwargs):
+        context = super(PostListView, self).get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            liked = [i for i in Post.objects.all() if Reaction.objects.filter(user=self.request.user, post=i)]
+            context['liked_post'] = liked
+        return context
+
+    def get_queryset(self):
+        user = get_object_or_404('User', username=self.get('user'))
+        return Post.objects.filter(user_name=user).order_by('-date_posted')
+
 
 # class PostListView(ListView, View):
 #         """
@@ -61,36 +72,59 @@ class PostListView(ListView, View):
 #         context_object_name = 'posts'
 #         ordering = ['-date_posted']
 #         paginate_by = 10
-#     def get_context_data(self, **kwargs):
-#         context = super(PostListView, self).get_context_data(**kwargs)
-#         if self.request.user.is_authenticated:
-#             liked = [i for i in Post.objects.all() if Reaction.objects.filter(user=self.request.user, post=i)]
-#             context['liked_post'] = liked
-#         return context
-#
-#     def get_queryset(self):
-#         user = get_object_or_404('User', username=self.get('user'))
-#         return Post.objects.filter(user_name=user).order_by('-date_posted')
 
 
 class PostDetailView(View):
-    """
-    Display detail of the post
-    """
 
     def get(self, request, id):
         post = get_object_or_404(Post, id=id)
         comments = post.comment_set.all()
-        tags = post.tag_set.all()
         return render(
             request,
-            "post: post_detail.html",
+            "contents/detail.html",
             context={
-                "post": post,
-                "comments": comments,
-                'tags': tags
+                "post":post,
+                "comments":comments,
             },
         )
+
+
+class CommentView(LoginRequiredMixin, View):
+    """
+    Display detail of the post
+    """
+
+    form_class = NewCommentForm
+    form_class_reply = CommentReplyForm
+
+    def setup(self, request, *args, **kwargs):
+        self.post_instance = get_object_or_404(Post, pk=kwargs['post_id'], slug=kwargs['post_slug'])
+        return super().setup(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        comments = self.post_instance.pcomments.filter(is_reply=False)
+        can_like = False
+        if request.user.is_authenticated and self.post_instance.user_can_like(request.user):
+            can_like = True
+        return render(request, 'home/detail.html',
+                      {'post': self.post_instance,
+                       'comments': comments,
+                       'form': self.form_class,
+                       'reply_form': self.form_class_reply,
+                       'can_like': can_like}
+                      )
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.post = self.post_instance
+            new_comment.save()
+            messages.success(request, 'your comment submitted successfully', 'success')
+            return redirect('post:post_detail',
+                            self.post_instance.id,
+                            self.post_instance.slug)
 
 
 class PostUpdateView(View, LoginRequiredMixin, UpdateView):
@@ -193,8 +227,8 @@ class SearchPost(LoginRequiredMixin, ListView):
                       },
                       )
 
-    def post(self, request, *args):
-        return self.get(request, *args)
+    # def post(self, request, *args):
+    #     return self.get(request, *args)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView, View):
@@ -246,34 +280,34 @@ class PostCreateView(LoginRequiredMixin, CreateView, View):
             },
         )
 
+#  Use soft delete to archive post.
+# class PostDeleteView(LoginRequiredMixin, DeleteView, View):
+#     """
+#      Allows users to delete a post.
+#     """
+#
+#     # model = Post
+#     # template_name = 'post_delete.html'
+#     # success_url = reverse_lazy('post_list')
+#
+#     def setup(self, request, id):
+#         self.this_post = get_object_or_404(Post, id=id)
+#         return super().setup(request, id)
+#
+#     def dispatch(self, request, id):
+#         if self.this_post.user.id != request.user.id:
+#             return redirect("contents:home")
+#
+#         return super().dispatch(request, id)
+#
+#     def get(self, request, id):
+#         post = Post.objects.filter(Post, id=id)
+#         post.delete()
+#         messages.success(request, 'post deleted successfully', 'success')
+#         return redirect('post:post_list')
 
-class PostDeleteView(LoginRequiredMixin, DeleteView, View):
-    """
-     Allows users to delete a post.
-    """
 
-    # model = Post
-    # template_name = 'post_delete.html'
-    # success_url = reverse_lazy('post_list')
-
-    def setup(self, request, id):
-        self.this_post = get_object_or_404(Post, id=id)
-        return super().setup(request, id)
-
-    def dispatch(self, request, id):
-        if self.this_post.user.id != request.user.id:
-            return redirect("contents:home")
-
-        return super().dispatch(request, id)
-
-    def get(self, request, id):
-        post = Post.objects.filter(Post, id=id)
-        post.delete()
-        messages.success(request, 'post deleted successfully', 'success')
-        return redirect('post:post_list')
-
-
-class CommentCreateView(LoginRequiredMixin, CreateView, View):
+# class CommentCreateView(LoginRequiredMixin, CreateView, View):
     # model = Comment
     # template_name = 'comment_create.html'
     # fields = ['comment', 'reply']
@@ -283,47 +317,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView, View):
     #     form.instance.user = self.request.user
     #     form.instance.post = Post.objects.get(pk=self.kwargs['post_id'])
     #     return super().form_valid(form)
-
-    def setup(self, request, id):
-        self.this_comment = get_object_or_404(Comment, id=id)
-        return super().setup(request, id)
-
-    def dispatch(self, request, id):
-        if self.this_comment.user.id != request.user.id:
-            return redirect("contents:home")
-
-        return super().dispatch(request, id)
-
-    def get(self, request, id):
-        form = NewCommentForm(instance=self.this_comment)
-        post = Post.objects.get(id=id)
-        return render(
-            request,
-            "post: create_post.html",
-            context={
-                "form": form,
-                'post': post
-            },
-        )
-
-    def post(self, request, id):
-        form = PostCreateForm(
-            request.POST,
-            request.FILES,
-            instance=self.this_comment,
-        )
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'you created a new comment', 'success')
-            return redirect("post:comment", self.this_comment.id)
-
-        return render(
-            request,
-            "post: comments.html",
-            context={
-                "form": form,
-            },
-        )
 
 
 class PostLikeView(LoginRequiredMixin, View):
@@ -406,12 +399,6 @@ class RoomListView(LoginRequiredMixin, ListView):
     context_object_name = 'rooms'
 
 
-class RoomDetailView(LoginRequiredMixin, DetailView):
-    model = Room
-    template_name = 'room_detail.html'
-    context_object_name = 'room'
-
-
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
     template_name = 'notification_list.html'
@@ -441,7 +428,7 @@ class NotificationListView(LoginRequiredMixin, ListView):
             # Process the notification based on your requirements
             notification.mark_as_read()
             return render(request,
-                          'notification_list.html',
+                          'show_notification.html',
                           )
         else:
             return super.get(request, *args, **kwargs)

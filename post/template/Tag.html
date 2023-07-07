@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="tag-list">
+  <h3>Popular Tags</h3>
+  <ul>
+    {% for tag in tags %}
+      <li><a href="{% url 'tag' tag.name %}">#{{ tag.name }}</a></li>
+    {% endfor %}
+  </ul>
+</div>

@@ -1,10 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="post-comments">
+  <ul class="comment-list">
+    {% for comment in comments %}
+      <li class="comment">
+        <div class="comment-header">
+          <img src="{{ comment.author.profile_picture }}" alt="{{ comment.author.username }}" class="avatar">
+          <h4 class="author">{{ comment.author.username }}</h4>
+          <small class="timestamp">{{ comment.timestamp }}</small>
+        </div>
+        <p class="content">{{ comment.content }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+  <form class="comment-form" method="post" action="{% url 'post_comment' post.id %}">
+    {% csrf_token %}
+    <textarea class="comment-input" name="comment" placeholder="Add a comment..."></textarea>
+    <button type="submit" class="comment-btn">Post</button>
+  </form>
+</div>

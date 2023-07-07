@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="notifications">
+  <h3>Notifications</h3>
+  <ul class="notification-list">
+    {% for notification in notifications %}
+      <li class="notification">
+        <div class="notification-content">
+          <img src="{{ notification.sender }}" alt="{{ notification.sender.username }}" class="avatar">
+          <p>{{ notification.message }}</p>
+        </div>
+        <small class="timestamp">{{ notification.created_at }}</small>
+      </li>
+    {% empty %}
+      <li class="no-notification">No new notifications.</li>
+    {% endfor %}
+  </ul>
+</div>
