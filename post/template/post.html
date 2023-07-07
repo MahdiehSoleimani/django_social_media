@@ -1,6 +1,5 @@
-<!-- comment.html -->
-<!DOCTYPE html>
-<html>
+{% extends "core/layout.html" %} {% load static %}
+{% block searchform %}
 <head>
     <title>Comment</title>
 </head>
@@ -10,4 +9,4 @@
     <p>Comment: {{ comment.comment }}</p>
     <!-- Additional comment details can be displayed here -->
 </body>
-</html>
+{% endblock %}

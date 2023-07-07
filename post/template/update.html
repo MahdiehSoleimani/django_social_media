@@ -1,3 +1,5 @@
+{% extends "core/layout.html" %} {% load static %}
+{% block %}
 <div class="profile">
   <h3>Edit Profile</h3>
   <form class="profile-form" method="post" action="{% url 'update_profile' %}" enctype="multipart/form-data">
@@ -17,4 +19,4 @@
     <button type="submit" class="profile-btn">Update</button>
   </form>
 </div>
-
+{% endblock %}
