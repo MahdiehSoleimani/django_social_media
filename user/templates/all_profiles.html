@@ -1,10 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Social Media App - User Profiles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container h1 {
+            text-align: center;
+        }
+
+        .profile-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .profile-card h2 {
+            margin-top: 0;
+        }
+
+        .profile-card p {
+            margin-bottom: 10px;
+        }
+
+        .profile-card .actions {
+            text-align: right;
+        }
+
+        .profile-card .actions a {
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
-
+    <div class="container">
+        <h1>User Profiles</h1>
+        {% for profile in Profile %}
+        <div class="profile-card">
+            <h2>{{ profile.user.username }}</h2>
+            <p><strong><img src="" alt="Image">:</strong> <input type="image" src="" alt="image"> </p>
+            <p><strong>Bio:</strong> {{ profile.bio }}</p>
+            <div class="actions">
+                <a href="/profile/{{ profile.user.id }}">View Profile</a>
+                <a href="/profile/{{ profile.user.id }}/edit">Edit Profile</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>No profiles found.</p>
+        {% endfor %}
+    </div>
 </body>
 </html>

@@ -10,7 +10,7 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username', 'email', 'password', 'confirm password']
 
 
 class UsernameField(forms.CharField):
@@ -65,7 +65,7 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        exclude = ['username']
+        include = ['bio', 'email']
 
     widgets = {
         "bio": forms.TextInput(attrs={'class': 'form-control'}),
