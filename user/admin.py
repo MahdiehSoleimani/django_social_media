@@ -1,16 +1,25 @@
 from django.contrib import admin
 from .models import Profile, FriendRequest, RecycleProfile
-
+from django.contrib.auth.admin import UserAdmin
 
 # admin.site.register(Profile)
 # admin.site.register(FriendRequest)
+
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
+
+
+class ExtendedUserAdmin(UserAdmin):
+    inlines = (ProfileInline,)
 
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['username', 'is_online', 'bio']
     list_filter = ['is_seen']
-    search_fields = ['username', 'username']
+    search_fields = ['username']
 
 
 @admin.register(FriendRequest)
